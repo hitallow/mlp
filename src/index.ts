@@ -1,8 +1,8 @@
 import { NeuralMLPNetwork } from "./models/mlp";
 
-const epocas = 1000000;
-const learningRate = 0.9;
-const hiddenLayers = 1;
+const epocas = 100000;
+const learningRate = 0.5;
+const hiddenLayers = 2;
 const quantityInputs = 2;
 const quantityOutputs = 1;
 
@@ -14,7 +14,7 @@ const mlp = new NeuralMLPNetwork(
   quantityOutputs
 );
 
-console.log("Quantidade de epocas", epocas);
+console.log("Quantidade de épocas", epocas);
 
 const acurracy = mlp.train(
   [
@@ -25,6 +25,37 @@ const acurracy = mlp.train(
   ],
   [0, 1, 1, 0]
 );
-console.log("Acuracia", acurracy);
+console.log("Acurácia", acurracy);
 
-console.log("Predict 0 - 0  = ", mlp.predict([0, 1]));
+const predict = [
+  {
+    x1: 0,
+    x2: 0,
+    expected: 0,
+    result: 0
+  },
+  {
+    x1: 0,
+    x2: 1,
+    expected: 1,
+    result: 0
+  },
+  {
+    x1: 1,
+    x2: 0,
+    expected: 1,
+    result: 0
+  },
+  {
+    x1: 1,
+    x2: 1,
+    expected: 0,
+    result: 0
+  }
+];
+
+predict.forEach((v) => {
+  v.result = Math.round(mlp.predict([v.x1, v.x2]));
+});
+
+console.table(predict);

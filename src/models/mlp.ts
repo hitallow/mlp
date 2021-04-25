@@ -6,9 +6,9 @@ export class NeuralMLPNetwork {
    * Total epochs to train
    */
   private epochs;
-  
+
   private learningRate: number;
-  
+
   private hiddenLayers: Perceptron[][];
 
   constructor(
@@ -25,11 +25,13 @@ export class NeuralMLPNetwork {
     this.hiddenLayers.push(
       ...Array(quantityHiddenLayers)
         .fill(0)
-        .map(() =>
-          Array(quantityInputs + 1)
+        .map((_, layerPos) => {
+          const layerPercptronInputs =
+            layerPos > 0 ? quantityInputs + 1 : quantityInputs;
+          return Array(quantityInputs + 1)
             .fill(0)
-            .map(() => new Perceptron(quantityInputs, new Sigmoid()))
-        )
+            .map(() => new Perceptron(layerPercptronInputs, new Sigmoid()));
+        })
     );
 
     // add to layers last perceptron
@@ -42,21 +44,22 @@ export class NeuralMLPNetwork {
             .map(() => new Perceptron(quantityInputs + 1, new Sigmoid()))
         )
     );
-    // this.hiddenLayers[1][0].setWeights([-0.017, -0.893, 0.148]);
   }
 
   private backwardPropagateError(expected: number, result: number) {
     const err = expected - result;
-    [...this.hiddenLayers].reverse().forEach((layer, indexLayer) => {
+    [...this.hiddenLayers].reverse().forEach((layer, indexLayer, clone) => {
       if (!indexLayer) {
         layer.forEach((neuron) => {
           neuron.calcDeltaOutPerceptron(err, result);
         });
       } else {
         layer.forEach((neuron, index) => {
-          let deltaOutput = this.hiddenLayers[indexLayer][0].getDelta();
-          let weight = this.hiddenLayers[indexLayer][0].getWeights()[index];
-          neuron.calcDeltaHiddenLayer(deltaOutput, weight);
+          clone[indexLayer - 1].forEach((next) => {
+            let deltaOutput = next.getDelta();
+            let weight = next.getWeights()[index];
+            neuron.calcDeltaHiddenLayer(deltaOutput, weight);
+          });
         });
       }
     });
