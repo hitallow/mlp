@@ -137,4 +137,8 @@ export class NeuralMLPNetwork {
     const mean = erros.reduce((a, b) => a + b, 0) / erros.length;
     return Math.abs(mean - 1);
   }
+
+  public getNetwork() {
+    return [...this.hiddenLayers];
+  }
 }
